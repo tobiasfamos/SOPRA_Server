@@ -28,9 +28,8 @@ public class Application {
             }
         };
     }
-
-    @RequestMapping(value = "/hello")
-    public String requestMappingTest(){
-        return "HELLO!!!";
+    @RequestMapping(value="mofo")
+    public String mofo(){
+        return "MOFO";
     }
 }
