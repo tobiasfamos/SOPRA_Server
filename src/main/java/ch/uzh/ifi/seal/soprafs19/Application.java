@@ -25,11 +25,8 @@ public class Application {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**").allowedOrigins("*");
+
             }
         };
-    }
-    @RequestMapping(value="mofo")
-    public String mofo(){
-        return "MOFO";
     }
 }
