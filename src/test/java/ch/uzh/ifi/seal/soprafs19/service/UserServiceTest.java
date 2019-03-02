@@ -6,6 +6,7 @@ import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @SpringBootTest(classes= Application.class)
 public class UserServiceTest {
 
+    private User testUser;
 
     @Qualifier("userRepository")
     @Autowired
@@ -32,18 +34,29 @@ public class UserServiceTest {
     @Autowired
     private UserService userService;
 
-    @Test
-    public void createUser() {
-        Assert.assertNull(userRepository.findByUsername("testUsername"));
-
-        User testUser = new User();
+    @Before
+    public void setUp(){
+        testUser = new User();
         testUser.setName("testName");
         testUser.setUsername("testUsername");
+        testUser.setBirthday("testBirthday");
+        testUser.setPassword("testPassword");
+    }
 
-        User createdUser = userService.createUser(testUser);
+    @Test
+    public void createUser() {
+        Assert.assertNull(userRepository.findByUsername("LocalTestUsername"));
+
+        User localTestUser = new User();
+        localTestUser.setName("testName");
+        localTestUser.setUsername("LocalTestUsername");
+        localTestUser.setBirthday("testBirthday");
+        localTestUser.setPassword("testPassword");
+        User createdUser = userService.createUser(localTestUser);
 
         Assert.assertNotNull(createdUser.getToken());
         Assert.assertEquals(createdUser.getStatus(),UserStatus.ONLINE);
         Assert.assertEquals(createdUser, userRepository.findByToken(createdUser.getToken()));
     }
+
 }
