@@ -34,7 +34,7 @@ public class UserService {
     public User createUser(User newUser) {
         newUser.setToken(UUID.randomUUID().toString());
         newUser.setStatus(UserStatus.ONLINE);
-        newUser.setCreationDate(new Date());
+        newUser.setCreationDate(new Date().getTime());
         userRepository.save(newUser);
         log.debug("Created Information for User: {}", newUser);
         return newUser;
@@ -45,7 +45,19 @@ public class UserService {
 
     }
 
+    public User getUserByUsername(String username){
+        return userRepository.findByUsername(username);
+    }
+
     public User getUserByName(String username){
         return userRepository.findByUsername(username);
+    }
+
+    public void updateUser(long id, User user) {
+        User userToCopy = userRepository.findById(id);
+        // Set the Name, Username and Birthday
+        userToCopy.setBirthday(user.getBirthday());
+        userToCopy.setName(user.getName());
+        userToCopy.setUsername(user.getUsername());
     }
 }

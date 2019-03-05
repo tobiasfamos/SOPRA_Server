@@ -21,13 +21,20 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    User createUser(@RequestBody User newUser) {
-        return service.createUser(newUser);
+    ResponseEntity<?> createUser(@RequestBody User newUser) {
+        User user = service.getUserByUsername(newUser.getUsername());
+        if(user == null){
+            User u = service.createUser(newUser);
+            return new ResponseEntity<User>(user, HttpStatus.CREATED);
+        }else{
+            return new ResponseEntity<String>("Username already Taken!", HttpStatus.CONFLICT);
+        }
     }
 
-    @GetMapping(value="/user")
-    User single(@PathVariable("userId") long userId){
-        return this.service.getUserById(userId);
+    @GetMapping(value="/user/{userId}")
+    ResponseEntity<?> single(@PathVariable("userId") long userId){
+        User user = service.getUserById(userId);
+        return new ResponseEntity<User>(user, HttpStatus.ACCEPTED);
     }
 
     @GetMapping(value="/authentication")
@@ -36,8 +43,20 @@ public class UserController {
         if(user != null && user.getPassword().equals(password)){
             return new ResponseEntity<User>(user, HttpStatus.ACCEPTED);
         }
-        return new ResponseEntity<String>(String.format("Invalid Username or Password! be %s and %s",username, password) , HttpStatus.FORBIDDEN);
+        return new ResponseEntity<String>("Invalid Username or Password!" , HttpStatus.FORBIDDEN);
 
+    }
+
+    @CrossOrigin
+    @PutMapping(value = "/users/{userId}")
+    ResponseEntity<?> changeUser(@PathVariable long userId, @RequestBody User user){
+        if(service.getUserById(userId) == null){
+            return new ResponseEntity<String>("User not Found", HttpStatus.NOT_FOUND);
+        }
+        else{
+            service.updateUser(userId, user);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
     }
 
 }
