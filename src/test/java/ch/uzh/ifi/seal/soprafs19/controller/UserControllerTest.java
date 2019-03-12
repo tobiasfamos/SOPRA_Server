@@ -44,6 +44,8 @@ public class UserControllerTest {
 
     private User testUser;
 
+    @Qualifier("userRepository")
+    @Autowired
     private UserRepository userRepository;
 
     private UserController userController;
@@ -64,8 +66,14 @@ public class UserControllerTest {
 
     @Test
     public void all() {
-        Iterable<User> returnedUsers = userController.all();
+        // Test for Empty in the beginning
+        ArrayList<User> returnedUsers = (ArrayList<User>) userController.all();
+        Assert.assertTrue("Size of Array not zero", returnedUsers.isEmpty());
 
+        //Test for testusers in list after added.
+        User newTestUser = (User) userController.createUser(testUser).getBody();
+        returnedUsers = (ArrayList<User>) userController.all();
+        Assert.assertEquals("Testuser not in array", newTestUser, returnedUsers.get(0));
     }
 
     @Test
@@ -75,6 +83,10 @@ public class UserControllerTest {
         long id = 1;
         testUser.setId(id);
         Assert.assertEquals("Not same User", testUser, response.getBody());
+
+        // Test for Fail due to already taken Username.
+        response = userController.createUser(testUser);
+        Assert.assertEquals("Wrong Status Code at fail to create login",HttpStatus.CONFLICT, response.getStatusCode());
 
     }
     @Test
