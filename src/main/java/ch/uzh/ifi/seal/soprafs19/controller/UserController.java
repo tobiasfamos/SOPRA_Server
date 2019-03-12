@@ -35,8 +35,13 @@ public class UserController {
     @GetMapping(value="/user/{userId}")
     ResponseEntity<?> single(@PathVariable("userId") long userId){
         User user = service.getUserById(userId);
-        return new ResponseEntity<User>(user, HttpStatus.ACCEPTED);
+        if(user != null) {
+            return new ResponseEntity<User>(user, HttpStatus.ACCEPTED);
+        }else{
+            return new ResponseEntity<String>("User Id is not Valid", HttpStatus.NOT_FOUND);
+        }
     }
+
     //TODO Chane to POST
     @GetMapping(value="/authentication")
     ResponseEntity<?> authentication(@RequestParam String username, @RequestParam String password){
