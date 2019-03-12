@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -26,6 +24,7 @@ public class UserService {
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+
 
     public Iterable<User> getUsers() {
         return this.userRepository.findAll();
@@ -49,11 +48,14 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-    public User getUserByName(String username){
-        return userRepository.findByUsername(username);
+    public User getUserByName(String name){
+        return userRepository.findByName(name);
     }
 
     public void updateUser(long id, User user) {
+        /*
+        *Updates the the Fields birthday, name and username of a User. It must be checked, that the username is not yet taken.
+        * */
         User userToCopy = userRepository.findById(id);
         // Set the Name, Username and Birthday
         userToCopy.setBirthday(user.getBirthday());
