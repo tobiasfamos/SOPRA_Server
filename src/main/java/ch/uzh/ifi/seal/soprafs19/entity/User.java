@@ -4,6 +4,7 @@ import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 
 import java.io.Serializable;
 import java.text.DateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -32,7 +33,7 @@ public class User implements Serializable {
 
 	//TODO Make it some kind of Date Type.
 	@Column(nullable = true)
-	private String birthday;
+	private LocalDate birthday;
 
 	@Column(nullable = false, unique = true) 
 	private String token;
@@ -91,11 +92,11 @@ public class User implements Serializable {
 		this.password = password;
 	}
 
-	public String getBirthday() {
+	public LocalDate getBirthday() {
 		return birthday;
 	}
 
-	public void setBirthday(String birthday) {
+	public void setBirthday(LocalDate birthday) {
 		this.birthday = birthday;
 	}
 

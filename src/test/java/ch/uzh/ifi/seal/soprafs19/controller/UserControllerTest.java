@@ -15,6 +15,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.LocalDate;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,10 +42,10 @@ public class UserControllerTest {
         testUser = new User();
         testUser.setName("testName");
         testUser.setUsername("testUsername");
-        testUser.setBirthday("testBirthday");
+        testUser.setBirthday(LocalDate.ofYearDay(1111,11));
         testUser.setPassword("testPassword");
 
-        testUserJson = "{\"name\":\"testName\",\"username\":\"testUsername\",\"password\":\"testPassword\",\"birthday\":\"testBirthday\" }";
+        testUserJson = "{\"name\":\"testName\",\"username\":\"testUsername\",\"password\":\"testPassword\",\"birthday\":\"1111-01-11\" }";
 
 
     }
@@ -100,7 +102,7 @@ public class UserControllerTest {
         User newUser2 = new User();
         newUser2.setName("newUser2");
         newUser2.setPassword("newUser2Password");
-        newUser2.setBirthday("newUser2Birthday");
+        newUser2.setBirthday(LocalDate.ofYearDay(1111,11));
         newUser2.setUsername("newUser2Username");
         newUser2 = userService.createUser(newUser2);
 
@@ -164,7 +166,7 @@ public class UserControllerTest {
     @Test
     public void testChangeUser() throws Exception{
         // Test for missing token
-        String altertUser = "{\"name\":\"testName\",\"username\":\"testUsername\",\"birthday\":\"testBirthday\" }";
+        String altertUser = "{\"name\":\"testName\",\"username\":\"testUsername\",\"birthday\":\"1111-01-11\" }";
         this.mockMvc.perform(put("/users/1").content(altertUser)).andExpect(status().is4xxClientError());
 
         // test for logged in and invalid token
@@ -197,12 +199,12 @@ public class UserControllerTest {
         // test for Username already taken
         User newUser2 = new User();
         newUser2.setUsername("newUsername");
-        newUser2.setBirthday("newBirthday");
+        newUser2.setBirthday(LocalDate.ofYearDay(1111,11));
         newUser2.setPassword("newPassword");
         newUser2.setName("newName");
         newUser2 = userService.createUser(newUser2);
 
-        String newAlterString = String.format("{\"username\": \"%s\",\"name\":\"newName\",\"birthday\":\"newBirthday\"} ",newUser.getUsername());
+        String newAlterString = String.format("{\"username\": \"%s\",\"name\":\"newName\",\"birthday\":\"1111-01-11\"} ",newUser.getUsername());
 
         result = this.mockMvc.perform(put(String.format("/users/%d",newUser2.getId()))
                 .header("token",newUser2.getToken())
@@ -233,7 +235,7 @@ public class UserControllerTest {
         Assert.assertTrue("Result does not containt Username",content.contains(user.getUsername()));
         Assert.assertTrue("Result does not contain Name", content.contains(user.getName()));
         Assert.assertTrue("Result does not contain token",content.contains(user.getToken()));
-        Assert.assertTrue("Result does not contain Birthday",content.contains(user.getBirthday()));
+        Assert.assertTrue("Result does not contain Birthday",content.contains(user.getBirthday().toString()));
         Assert.assertTrue("Result does not contain Id",content.contains(user.getId().toString()));
     }
  }

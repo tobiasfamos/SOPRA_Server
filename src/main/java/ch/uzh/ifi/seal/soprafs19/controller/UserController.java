@@ -5,7 +5,6 @@ import ch.uzh.ifi.seal.soprafs19.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
@@ -53,6 +52,7 @@ public class UserController {
 
     }
 
+    @CrossOrigin
     @PostMapping(value="/authentication")
     ResponseEntity<User> authentication(@RequestBody User userToAuthenticate){
         User user = service.getUserByUsername(userToAuthenticate.getUsername());

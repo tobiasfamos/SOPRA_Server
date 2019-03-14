@@ -5,6 +5,7 @@ import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
+import org.apache.tomcat.jni.Local;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -51,7 +53,7 @@ public class UserServiceTest {
         testUser = new User();
         testUser.setName("testName");
         testUser.setUsername("testUsername");
-        testUser.setBirthday("testBirthday");
+        testUser.setBirthday(LocalDate.ofYearDay(1111,11));
         testUser.setPassword("testPassword");
         testUser = userService.createUser(testUser);
         LOGGER.info(userRepository.findByName("testName").toString());
@@ -75,7 +77,7 @@ public class UserServiceTest {
         User localTestUser = new User();
         localTestUser.setName("LocaltestName");
         localTestUser.setUsername("LocalTestUsername");
-        localTestUser.setBirthday("LocaltestBirthday");
+        localTestUser.setBirthday(LocalDate.ofYearDay(1111,11));
         localTestUser.setPassword("LocaltestPassword");
         User createdUser = userService.createUser(localTestUser);
 
@@ -106,7 +108,7 @@ public class UserServiceTest {
     @Test
     public void updateUser() {
         String newName = "NewName";
-        String newBirthday = "NewBirthday";
+        LocalDate newBirthday = LocalDate.ofYearDay(1111,11);
         String newUsername = "New Username";
         testUser.setName(newName);
         testUser.setBirthday(newBirthday);
