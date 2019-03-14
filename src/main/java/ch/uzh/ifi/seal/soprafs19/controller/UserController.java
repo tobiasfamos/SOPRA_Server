@@ -53,11 +53,10 @@ public class UserController {
 
     }
 
-    //TODO Chane to POST
-    @GetMapping(value="/authentication")
-    ResponseEntity<User> authentication(@RequestParam String username, @RequestParam String password){
-        User user = service.getUserByUsername(username);
-        if(user != null && user.getPassword().equals(password)){
+    @PostMapping(value="/authentication")
+    ResponseEntity<User> authentication(@RequestBody User userToAuthenticate){
+        User user = service.getUserByUsername(userToAuthenticate.getUsername());
+        if(user != null && user.getPassword().equals(userToAuthenticate.getPassword())){
             return new ResponseEntity<User>(user, HttpStatus.ACCEPTED);
         }
         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid Username or Password");
@@ -67,19 +66,30 @@ public class UserController {
     @CrossOrigin
     @PutMapping(value = "/users/{userId}")
     ResponseEntity<?> changeUser(@RequestHeader(value = "token") String token, @PathVariable long userId, @RequestBody User user){
+        // TODO think logic through again. What if getUSerById returns null and so does getUserBytoken?
         // Check if the user is logged in
-        if(service.getUserByToken(token) != null) {
-            if (service.getUserById(userId) == null) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found");
-            } else if ((service.getUserByUsername(user.getUsername()) == null) || (service.getUserByUsername(user.getUsername()).getId().equals(user.getId()))) {
+        if(service.getUserByToken(token) == service.getUserById(userId)) {
+            // Either right user or both null. -> Either invalid token and invalid id or token matching the ID
+            // Check token first, since otherwise one could get whether the id is used or not
+            if(service.getUserByToken(token) == null){
+                // invalid token
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to alter this user");
+            } else if ((service.getUserByUsername(user.getUsername()) == null) || service.getUserById(userId).getUsername().equals(user.getUsername())) {
                 // If the username is not yet taken OR the username is taken by the given user from the Body. (thus username was not changed)
                 service.updateUser(userId, user);
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             } else {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already taken");
             }
-        }else{
+        }
+        else if(service.getUserByToken(token) == null){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not logged in");
+        }
+        else if (service.getUserById(userId) == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found");
+        }
+        else{
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to alter this user");
         }
     }
 

@@ -66,4 +66,8 @@ public class UserService {
     public User getUserByToken(String token){
         return userRepository.findByToken(token);
     }
+
+    public void deleteUser(User newUser) {
+        userRepository.delete(newUser);
+    }
 }
