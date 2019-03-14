@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+
 @Entity
 public class User implements Serializable {
 	
@@ -21,10 +22,11 @@ public class User implements Serializable {
 	@Id
 	@GeneratedValue
 	private Long id;
-	
+
+
 	@Column(nullable = false) 
 	private String name;
-	
+
 	@Column(nullable = false, unique = true) 
 	private String username;
 

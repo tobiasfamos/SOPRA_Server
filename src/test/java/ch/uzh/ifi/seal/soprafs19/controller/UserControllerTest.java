@@ -88,6 +88,26 @@ public class UserControllerTest {
         userService.deleteUser(userService.getUserByUsername("testUsername"));
     }
 
+    @Test
+    public void testCreateUserWithEmptyFields() throws Exception{
+        String emptyPassword = "{\"name\":\"testName\",\"username\":\"testUsername\",\"password\":\"\",\"birthday\":\"1111-01-11\" }";
+        String emptyUsername = "{\"name\":\"testName\",\"username\":\"\",\"password\":\"testPassword\",\"birthday\":\"1111-01-11\" }";
+
+        MvcResult result = this.mockMvc.perform(post("/users").header("Content-Type","application/json")
+                .content(emptyPassword))
+                .andExpect(status().isNotAcceptable())
+                .andReturn();
+
+        Assert.assertEquals(result.getResponse().getErrorMessage(), "The password can not be empty");
+
+        //Test for empty Username
+         result = this.mockMvc.perform(post("/users").header("Content-Type","application/json")
+                .content(emptyUsername))
+                .andExpect(status().isNotAcceptable())
+                .andReturn();
+
+        Assert.assertEquals(result.getResponse().getErrorMessage(), "The username can not be empty");
+    }
     // Tests for getting all Users
     @Test
     public void testGetAllUsers() throws Exception{

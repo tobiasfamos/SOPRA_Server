@@ -29,6 +29,12 @@ public class UserController {
     ResponseEntity<?> createUser(@RequestBody User newUser) {
         User user = service.getUserByUsername(newUser.getUsername());
         if(user == null){
+            if(newUser.getUsername().equals("")){
+                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,"The username can not be empty");
+            }
+            if(newUser.getPassword().equals("")){
+                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,"The password can not be empty");
+            }
             user = service.createUser(newUser);
             return new ResponseEntity<User>(user, HttpStatus.CREATED);
         }else{
