@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +31,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.validation.constraints.Null;
 import java.util.ArrayList;
 
 import static org.junit.Assert.*;
@@ -66,13 +68,9 @@ public class UserControllerTest {
 
     @Test
     public void all() {
-        // Test for Empty in the beginning
-        ArrayList<User> returnedUsers = (ArrayList<User>) userController.all();
-        Assert.assertTrue("Size of Array not zero", returnedUsers.isEmpty());
-
         //Test for testusers in list after added.
         User newTestUser = (User) userController.createUser(testUser).getBody();
-        returnedUsers = (ArrayList<User>) userController.all();
+        ArrayList<User> returnedUsers = (ArrayList<User>) userController.all(newTestUser.getToken());
         Assert.assertEquals("Testuser not in array", newTestUser, returnedUsers.get(0));
     }
 
@@ -91,10 +89,26 @@ public class UserControllerTest {
     }
     @Test
     public void single() {
+        ResponseEntity<?> response = userController.single(1);
+        Assert.assertEquals("Wrong Status Code at sending wrong ID",HttpStatus.NOT_FOUND, response.getStatusCode());
+
+        User newUser = (User) userController.createUser(testUser).getBody();
+        response = userController.single(newUser.getId());
+        Assert.assertEquals("Wrong or no user returned", newUser, (User) response.getBody());
+
     }
 
     @Test
-    public void authentication() {
+    public void authentication() throws NullPointerException {
+        // Test access denied
+        ResponseEntity<?> response = userController.authentication(testUser.getUsername(), testUser.getPassword());
+        Assert.assertEquals("Wrong Status code", HttpStatus.FORBIDDEN, response.getStatusCode());
+
+        // Test access granted
+        User newUser = (User) userController.createUser(testUser).getBody();
+        response = userController.authentication(newUser.getUsername(), newUser.getPassword());
+        Assert.assertEquals("Wrong Status Code", HttpStatus.ACCEPTED, response.getStatusCode());
+        Assert.assertEquals("Wrong User was returned", newUser, (User) response.getBody());
     }
 
     @Test

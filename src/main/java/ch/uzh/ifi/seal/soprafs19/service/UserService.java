@@ -62,4 +62,8 @@ public class UserService {
         userToCopy.setName(user.getName());
         userToCopy.setUsername(user.getUsername());
     }
+
+    public User getUserByToken(String token){
+        return userRepository.findByToken(token);
+    }
 }
