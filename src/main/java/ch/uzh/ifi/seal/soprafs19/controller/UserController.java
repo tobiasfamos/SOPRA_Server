@@ -72,7 +72,6 @@ public class UserController {
     @CrossOrigin
     @PutMapping(value = "/users/{userId}")
     ResponseEntity<?> changeUser(@RequestHeader(value = "token") String token, @PathVariable long userId, @RequestBody User user){
-        // TODO think logic through again. What if getUSerById returns null and so does getUserBytoken?
         // Check if the user is logged in
         if(service.getUserByToken(token) == service.getUserById(userId)) {
             // Either right user or both null. -> Either invalid token and invalid id or token matching the ID

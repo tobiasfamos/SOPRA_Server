@@ -33,7 +33,6 @@ public class User implements Serializable {
 	@Column(nullable = false)
 	private String password;
 
-	//TODO Make it some kind of Date Type.
 	@Column(nullable = true)
 	private LocalDate birthday;
 
