@@ -3,16 +3,26 @@ package ch.uzh.ifi.seal.soprafs19.controller;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
+
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
+
 @RestController
 public class SantoriniController {
+
+    //LOGGER
+    private final Logger log = LoggerFactory.getLogger(UserService.class);
 
 
     //Constants
@@ -24,6 +34,37 @@ public class SantoriniController {
         this.service = service;
         this.gameservice = gameservice;
     }
+
+    //USEFUL FUNCTIONS
+    //converts a string into a long
+    //mostly used for Id
+    public long convert_to_long(String x){
+        try {
+            long result = Long.parseLong(x);
+            return (result);
+        }catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id is not a Long");
+        }
+    }
+
+    public boolean convert_to_boolean(String x){
+        try {
+            boolean result = Boolean.parseBoolean(x);
+            return (result);
+        }catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id is not a Boolean");
+        }
+    }
+
+    public int convert_to_int(String x){
+        try {
+            int result = Integer.parseInt(x);
+            return (result);
+        }catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id is not an Integer");
+        }
+    }
+
 
 
     //USER LOGIN
@@ -114,9 +155,12 @@ public class SantoriniController {
     //SANTORINI GAME
 
     @PostMapping("/invitation")
-    public void sendInvitation(@RequestBody Map<Long, Long> json){
-        Long inviterId= json.get("inviterId");
-        Long receiverId= json.get("receiverId");
+    public void sendInvitation(@RequestBody  Object json)throws Exception{
+        LinkedHashMap jsonbody=(LinkedHashMap)json;
+        String inviterIdstring=jsonbody.get("inviterId").toString();
+        String receiverIdstring=jsonbody.get("receiverId").toString();
+        long inviterId = convert_to_long(inviterIdstring);
+        long receiverId = convert_to_long(receiverIdstring);
         this.service.add_invitation(inviterId, receiverId);
     }
 
@@ -125,11 +169,17 @@ public class SantoriniController {
         return(this.service.get_all_Invitations(userId));
     }
 
-    //Weiss nicht wie? ->Answer Object?
-    /*@PutMapping("/invitation")
-    public void sendersponse(@RequestBody ){
-
-    }*/
+    @PutMapping("/invitation")
+    public void senderResponse(@RequestBody Object json)throws Exception{
+        LinkedHashMap jsonbody=(LinkedHashMap)json;
+        String inviterIdstring=jsonbody.get("inviterId").toString();
+        String receiverIdstring=jsonbody.get("inviteeId").toString();
+        String answerstring=jsonbody.get("answer").toString();
+        long inviterId=convert_to_long(inviterIdstring);
+        long inviteeId=convert_to_long(inviterIdstring);
+        boolean answer=convert_to_boolean(answerstring);
+        this.service.invitationResponse(inviterId,inviteeId,answer);
+    }
 
     @GetMapping("/game/{gameid}")
     public Game sendsgameback(@PathVariable Long gameid){
@@ -141,41 +191,65 @@ public class SantoriniController {
         this.gameservice.update(gameId,game);
     }
 
-
-    //how to extract one thing
-    /*
     @PostMapping("/quit/{gameid}")
-    public void quitgame(@PathVariable long gameId, @RequestBody  Object obj){
+    public void quitgame(@PathVariable long gameId, @RequestBody  Object json){
+        LinkedHashMap jsonbody=(LinkedHashMap)json;
+        String userIdstring=jsonbody.get("userId").toString();
+        long userId=convert_to_long(userIdstring);
         this.gameservice.leaveGame(userId, gameId);
-    }*/
+    }
 
     @PostMapping("/matchmaking")
     public void startmatchmaking(long userId){
         this.service.startmatchmaking(userId);
     }
 
-    /*how to extract one thing
+
     @PutMapping("/godcard/{gameId}")
-    public void selectGodPower(@PathVariable long gameId, @RequestBody userId, cardId ){
-        this.service.updateGodcard(gameid,userId,cardId)
-     }*/
+    public void selectGodPower(@PathVariable long gameId, @RequestBody Object json){
+        LinkedHashMap jsonbody=(LinkedHashMap)json;
+        String userIdstring=jsonbody.get("userId").toString();
+        String cardIdstring=jsonbody.get("cardId").toString();
+        long userId=convert_to_long(userIdstring);
+        int cardId=convert_to_int(cardIdstring);
+        this.service.updateGodCard(gameId,userId,cardId);
+     }
 
-    /*how to extract only four things
     @PostMapping("/movement/{gameId}")
-    public Game moveWorker(@Pathvariable long gameId @RequestBody ){
-        return(this.gameservice.move(all_the_stuff));
-
+    public Game moveWorker(@PathVariable long gameId, @RequestBody Object json){
+        LinkedHashMap jsonbody=(LinkedHashMap)json;
+        String userIdstring=jsonbody.get("userId").toString();
+        String workerIdstring=jsonbody.get("workerId").toString();
+        String posXstring=jsonbody.get("posX").toString();
+        String posYstring=jsonbody.get("posY").toString();
+        long userId=convert_to_long(userIdstring);
+        int workerId=convert_to_int(workerIdstring);
+        int posX=convert_to_int(posXstring);
+        int posY=convert_to_int(posYstring);
+        return(this.gameservice.move(userId,gameId,workerId,posX,posY));
     }
 
-    @PostMapping("/movement/{gameId}")
-    public Game build(@PathVariable long gameId @RequestBody ){
-        return(this.gameservice.build.(all_the_stuff));
-    }*/
+    @PostMapping("/building/{gameId}")
+    public Game build(@PathVariable long gameId, @RequestBody Object json){
+        LinkedHashMap jsonbody=(LinkedHashMap)json;
+        String userIdstring=jsonbody.get("userId").toString();
+        String workerIdstring=jsonbody.get("workerId").toString();
+        String posXstring=jsonbody.get("posX").toString();
+        String posYstring=jsonbody.get("posY").toString();
+        long userId=convert_to_long(userIdstring);
+        int workerId=convert_to_int(workerIdstring);
+        int posX=convert_to_int(posXstring);
+        int posY=convert_to_int(posYstring);
+        return(this.gameservice.build(gameId,userId,workerId,posX,posY));
+    }
 
-    /*@PostMapping("/waive/{gameId")
-    public void cancelGodPower(@PathVariable long gameId, @RequestBody ?){
-        this.gameservice.waiveGodcard(gameId,userId);
-    }*/
+    @PostMapping("/waive/{gameId")
+    public void cancelGodPower(@PathVariable long gameId, @RequestBody Object json){
+        LinkedHashMap jsonbody=(LinkedHashMap)json;
+        String userIdstring=jsonbody.get("userId").toString();
+        long userId=convert_to_long(userIdstring);
+        this.gameservice.waiveGodCard(gameId,userId);
+    }
 
 
     @GetMapping("/turn/{gameId}")

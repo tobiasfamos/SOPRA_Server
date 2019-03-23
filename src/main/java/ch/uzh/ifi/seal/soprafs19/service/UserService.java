@@ -85,10 +85,12 @@ public class UserService {
 
     //LOGIN ENDS
 
+    public void invitationResponse(long inviterId, long inviteeId, boolean answer){
+        //give the inviter the answer of the invitee
+    }
 
-
-    public void add_invitation(Long inviterId, Long receiverId){
-        User receiverUser = this.userRepository.findById(convert_to_long(receiverId));
+    public void add_invitation(long inviterId, long receiverId){
+        User receiverUser = this.userRepository.findById(receiverId);
         receiverUser.receive_invitation(inviterId);
     }
 
