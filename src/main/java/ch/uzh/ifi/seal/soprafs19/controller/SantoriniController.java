@@ -1,20 +1,32 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
 
+import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import ch.uzh.ifi.seal.soprafs19.service.GameService;
+import java.util.LinkedHashSet;
+import java.util.Map;
 
 @RestController
-public class UserController {
+public class SantoriniController {
 
+
+    //Constants
     private final UserService service;
+    private final GameService gameservice;
 
-    UserController(UserService service) {
+    //Constructor
+    SantoriniController(UserService service, GameService gameservice) {
         this.service = service;
+        this.gameservice = gameservice;
     }
+
+
+    //USER LOGIN
 
     @GetMapping("/users")
     Iterable<User> all(@RequestHeader(value = "token") String token) {
@@ -46,12 +58,12 @@ public class UserController {
     ResponseEntity<User> single(@RequestHeader(value = "token") String token, @PathVariable("userId") long userId){
         // Check for validity of request:
         if(service.getUserByToken(token) != null){
-        User user = service.getUserById(userId);
-        if(user != null) {
-            return new ResponseEntity<User>(user, HttpStatus.ACCEPTED);
-        }else{
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User Id is not Valid");
-        }
+            User user = service.getUserById(userId);
+            if(user != null) {
+                return new ResponseEntity<User>(user, HttpStatus.ACCEPTED);
+            }else{
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User Id is not Valid");
+            }
         }else{
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not logged in");
         }
@@ -98,4 +110,79 @@ public class UserController {
         }
     }
 
+
+    //SANTORINI GAME
+
+    @PostMapping("/invitation")
+    public void sendInvitation(@RequestBody Map<Long, Long> json){
+        Long inviterId= json.get("inviterId");
+        Long receiverId= json.get("receiverId");
+        this.service.add_invitation(inviterId, receiverId);
+    }
+
+    @GetMapping("/invitation/{userId}")
+    public LinkedHashSet<Long> seeInvitations(@PathVariable long userId){
+        return(this.service.get_all_Invitations(userId));
+    }
+
+    //Weiss nicht wie? ->Answer Object?
+    /*@PutMapping("/invitation")
+    public void sendersponse(@RequestBody ){
+
+    }*/
+
+    @GetMapping("/game/{gameid}")
+    public Game sendsgameback(@PathVariable Long gameid){
+        return(this.gameservice.getGame(gameid));
+    }
+
+    @PutMapping("/game/{gameid}")
+    public void updateGame(@PathVariable long gameId, @RequestBody Game game){
+        this.gameservice.update(gameId,game);
+    }
+
+
+    //how to extract one thing
+    /*
+    @PostMapping("/quit/{gameid}")
+    public void quitgame(@PathVariable long gameId, @RequestBody  Object obj){
+        this.gameservice.leaveGame(userId, gameId);
+    }*/
+
+    @PostMapping("/matchmaking")
+    public void startmatchmaking(long userId){
+        this.service.startmatchmaking(userId);
+    }
+
+    /*how to extract one thing
+    @PutMapping("/godcard/{gameId}")
+    public void selectGodPower(@PathVariable long gameId, @RequestBody userId, cardId ){
+        this.service.updateGodcard(gameid,userId,cardId)
+     }*/
+
+    /*how to extract only four things
+    @PostMapping("/movement/{gameId}")
+    public Game moveWorker(@Pathvariable long gameId @RequestBody ){
+        return(this.gameservice.move(all_the_stuff));
+
+    }
+
+    @PostMapping("/movement/{gameId}")
+    public Game build(@PathVariable long gameId @RequestBody ){
+        return(this.gameservice.build.(all_the_stuff));
+    }*/
+
+    /*@PostMapping("/waive/{gameId")
+    public void cancelGodPower(@PathVariable long gameId, @RequestBody ?){
+        this.gameservice.waiveGodcard(gameId,userId);
+    }*/
+
+
+    @GetMapping("/turn/{gameId}")
+    public Game turn(@PathVariable long gameId){
+        return(this.gameservice.changeturn(gameId));
+    }
+
+
+    //highlight?? zweimal move und build..
 }

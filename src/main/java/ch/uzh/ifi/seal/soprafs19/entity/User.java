@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.LinkedHashSet;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -117,5 +118,24 @@ public class User implements Serializable {
 
 	public void setCreationDate(long creationDate) {
 		this.creationDate = creationDate;
+	}
+
+
+	//SANTORINI START
+
+	//ATTRIBUTES
+
+	@Column
+	private LinkedHashSet<Long> invitations;
+
+
+	//GETTERS AND SETTERS
+	public void receive_invitation(long id){
+		//adds the Id at the end of the LinkedHashSet
+		invitations.add(id);
+	}
+
+	public LinkedHashSet<Long> getAllInvitations(){
+		return (invitations);
 	}
 }
