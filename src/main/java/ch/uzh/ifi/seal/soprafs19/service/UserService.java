@@ -91,7 +91,9 @@ public class UserService {
 
     public void add_invitation(long inviterId, long receiverId){
         User receiverUser = this.userRepository.findById(receiverId);
-        receiverUser.receive_invitation(inviterId);
+        log.info("got the receiver User");
+        //Long inviterIdfinal=(Long)inviterId;
+        receiverUser.receiveInvitation(inviterId);
     }
 
     public LinkedHashSet<Long> get_all_Invitations(long userId){

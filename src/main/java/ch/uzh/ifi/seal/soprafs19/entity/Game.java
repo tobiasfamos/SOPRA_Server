@@ -19,5 +19,22 @@ public class Game implements Serializable {
     @Column
     private Array[][] state;
 
+    //Getters and Setters
+
+    public Long getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(Long gameId) {
+        this.gameId = gameId;
+    }
+
+    public Array[][] getState() {
+        return state;
+    }
+
+    public void setState(Array[][] state) {
+        this.state = state;
+    }
 
 }

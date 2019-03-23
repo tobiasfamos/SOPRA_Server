@@ -1,13 +1,20 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
 
 import ch.uzh.ifi.seal.soprafs19.Application;
+import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
+import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
+import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -17,6 +24,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDate;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -25,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes= Application.class)
 @AutoConfigureMockMvc
-public class UserControllerTest {
+public class SantoriniControllerTest {
 
     private User testUser;
     private String testUserJson;
@@ -35,6 +43,10 @@ public class UserControllerTest {
 
     @Autowired
     private UserService userService;
+
+    @Qualifier("gameRepository")
+    @Autowired
+    private GameRepository gameRepository;
 
 
     @Before
@@ -258,4 +270,140 @@ public class UserControllerTest {
         Assert.assertTrue("Result does not contain Birthday",content.contains(user.getBirthday().toString()));
         Assert.assertTrue("Result does not contain Id",content.contains(user.getId().toString()));
     }
- }
+
+
+    //SANTORINI GAME TESTS
+
+
+    @Test
+    public void testInvitation()throws Exception{
+        User testUser3 = new User();
+        testUser3.setName("testName");
+        testUser3.setUsername("testUsername3");
+        testUser3.setBirthday(LocalDate.ofYearDay(1111,11));
+        testUser3.setPassword("testPassword");
+
+        User newUser3 = userService.createUser(testUser3);
+
+        //getting the id
+        long id=newUser3.getId();
+
+        //write the jsonfile
+        String jsonfile = "{\"inviterId\" : \"3\", \"receiverId\" : \""+id+"\"}";
+
+        this.mockMvc.perform(post("/invitation")
+                .content(jsonfile)
+                .contentType(APPLICATION_JSON_UTF8)
+                .header("sending an invitation","invitation ID's"))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    public void testGetInvitation()throws Exception{
+        User testUser4 = new User();
+        testUser4.setName("testName");
+        testUser4.setUsername("testUsername4");
+        testUser4.setBirthday(LocalDate.ofYearDay(1111,11));
+        testUser4.setPassword("testPassword");
+
+        User newUser4 = userService.createUser(testUser4);
+
+        //getting the id
+        long id=newUser4.getId();
+
+        this.mockMvc.perform(get("/invitation/"+id)
+                .header("test getting all invitations","invitations"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testAnswerInvitation()throws Exception{
+        //write the jsonfile
+        String jsonfile = "{\"inviterId\" : \"5\", \"inviteeId\" : \"7\", \"answer\" : \"true\"}";
+
+        this.mockMvc.perform(put("/invitation")
+                .content(jsonfile)
+                .contentType(APPLICATION_JSON_UTF8)
+                .header("writing an answer, update invitations","invitations ID and answer"))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    public void testGetGame()throws Exception{
+
+        this.mockMvc.perform(get("/game/1")
+                .header("writing an answer, update invitations","invitations ID and answer"))
+                .andExpect(status().isOk());
+    }
+
+    /*@Test
+    public void testUpdateGame()throws Exception{
+
+        //create game and save it into the database
+        Game game= new Game();
+        game.setGameId((long)1);
+        gameRepository.save(game);
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+        ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+        String requestJson=ow.writeValueAsString(game);
+
+        this.mockMvc.perform(put("/game/1")
+                .content(requestJson)
+                .header("update game","gameupdate"))
+                .andExpect(status().isOk());
+    }*/
+
+    @Test
+    public void testMovement()throws Exception{
+        //create game and save it into the database
+        Game game= new Game();
+        game.setGameId((long)1);
+        gameRepository.save(game);
+
+        //write the jsonfile
+        String jsonfile = "{\"userId\" : \"5\", \"workerId\" : \"7\", \"posX\" : \"1\",\"posY\" : \"1\"}";
+
+        this.mockMvc.perform(post("/movement/1")
+                .content(jsonfile)
+                .contentType(APPLICATION_JSON_UTF8)
+                .header("movement","movement"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testBuilding()throws Exception{
+        //create game and save it into the database
+        Game game= new Game();
+        game.setGameId((long)1);
+        gameRepository.save(game);
+
+        //write the jsonfile
+        String jsonfile = "{\"userId\" : \"5\", \"workerId\" : \"7\", \"posX\" : \"1\",\"posY\" : \"1\"}";
+
+        this.mockMvc.perform(post("/building/1")
+                .content(jsonfile)
+                .contentType(APPLICATION_JSON_UTF8)
+                .header("building","building"))
+                .andExpect(status().isOk());
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}

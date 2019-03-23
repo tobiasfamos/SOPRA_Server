@@ -24,6 +24,11 @@ public class GameService {
     public GameService(GameRepository GameRepository) { this.GameRepository = GameRepository;
     }
 
+    public void createGame(){
+        Game game= new Game();
+        GameRepository.save(game);
+    }
+
     public Game getGame(Long gameId){
         return(this.GameRepository.findById(convert_to_long(gameId)));
     }

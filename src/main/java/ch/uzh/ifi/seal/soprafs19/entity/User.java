@@ -16,7 +16,6 @@ import javax.persistence.Id;
 
 @Entity
 public class User implements Serializable {
-	
 
 	private static final long serialVersionUID = 1L;
 
@@ -126,11 +125,10 @@ public class User implements Serializable {
 	//ATTRIBUTES
 
 	@Column
-	private LinkedHashSet<Long> invitations;
-
+	private LinkedHashSet<Long> invitations = new LinkedHashSet<Long>();
 
 	//GETTERS AND SETTERS
-	public void receive_invitation(long id){
+	public void receiveInvitation(long id){
 		//adds the Id at the end of the LinkedHashSet
 		invitations.add(id);
 	}
