@@ -3,8 +3,6 @@ package ch.uzh.ifi.seal.soprafs19.controller;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -12,10 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
-
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.Map;
+
 
 
 @RestController
@@ -38,7 +35,7 @@ public class SantoriniController {
     //USEFUL FUNCTIONS
     //converts a string into a long
     //mostly used for Id
-    public long convert_to_long(String x){
+    private long convertToLong(String x){
         try {
             long result = Long.parseLong(x);
             return (result);
@@ -47,7 +44,7 @@ public class SantoriniController {
         }
     }
 
-    public boolean convert_to_boolean(String x){
+    private boolean convertToBoolean(String x){
         try {
             boolean result = Boolean.parseBoolean(x);
             return (result);
@@ -56,7 +53,7 @@ public class SantoriniController {
         }
     }
 
-    public int convert_to_int(String x){
+    private int convertToInt(String x){
         try {
             int result = Integer.parseInt(x);
             return (result);
@@ -155,29 +152,31 @@ public class SantoriniController {
     //SANTORINI GAME
 
     @PostMapping("/invitation")
-    public void sendInvitation(@RequestBody  Object json)throws Exception{
+    public void sendInvitation(@RequestHeader(value = "token") String token,@RequestBody  Object json)throws Exception{
         LinkedHashMap jsonbody=(LinkedHashMap)json;
         String inviterIdstring=jsonbody.get("inviterId").toString();
         String receiverIdstring=jsonbody.get("receiverId").toString();
-        long inviterId = convert_to_long(inviterIdstring);
-        long receiverId = convert_to_long(receiverIdstring);
-        this.service.add_invitation(inviterId, receiverId);
+        long inviterId = convertToLong(inviterIdstring);
+        long receiverId = convertToLong(receiverIdstring);
+        this.service.addInvitation(inviterId, receiverId);
+
+        //token check
     }
 
     @GetMapping("/invitation/{userId}")
-    public LinkedHashSet<Long> seeInvitations(@PathVariable long userId){
+    public LinkedHashSet<Long> seeInvitations(@RequestHeader(value = "token") String token,@PathVariable long userId){
         return(this.service.get_all_Invitations(userId));
     }
 
     @PutMapping("/invitation")
-    public void senderResponse(@RequestBody Object json)throws Exception{
+    public void senderResponse(@RequestHeader(value = "token") String token,@RequestBody Object json)throws Exception{
         LinkedHashMap jsonbody=(LinkedHashMap)json;
         String inviterIdstring=jsonbody.get("inviterId").toString();
         String receiverIdstring=jsonbody.get("inviteeId").toString();
         String answerstring=jsonbody.get("answer").toString();
-        long inviterId=convert_to_long(inviterIdstring);
-        long inviteeId=convert_to_long(inviterIdstring);
-        boolean answer=convert_to_boolean(answerstring);
+        long inviterId=convertToLong(inviterIdstring);
+        long inviteeId=convertToLong(inviterIdstring);
+        boolean answer=convertToBoolean(answerstring);
         this.service.invitationResponse(inviterId,inviteeId,answer);
     }
 
@@ -187,74 +186,74 @@ public class SantoriniController {
     }
 
     @PutMapping("/game/{gameid}")
-    public void updateGame(@PathVariable long gameId, @RequestBody Game game){
+    public void updateGame(@RequestHeader(value = "token") String token,@PathVariable long gameId, @RequestBody Game game){
         this.gameservice.update(gameId,game);
     }
 
     @PostMapping("/quit/{gameid}")
-    public void quitgame(@PathVariable long gameId, @RequestBody  Object json){
+    public void quitgame(@RequestHeader(value = "token") String token,@PathVariable long gameId, @RequestBody  Object json){
         LinkedHashMap jsonbody=(LinkedHashMap)json;
         String userIdstring=jsonbody.get("userId").toString();
-        long userId=convert_to_long(userIdstring);
+        long userId=convertToLong(userIdstring);
         this.gameservice.leaveGame(userId, gameId);
     }
 
     @PostMapping("/matchmaking")
-    public void startmatchmaking(long userId){
-        this.service.startmatchmaking(userId);
+    public void startmatchmaking(@RequestHeader(value = "token") String token, @RequestBody long userId){
+        this.service.startMatchmaking(userId);
     }
 
 
     @PutMapping("/godcard/{gameId}")
-    public void selectGodPower(@PathVariable long gameId, @RequestBody Object json){
+    public void selectGodPower(@RequestHeader(value = "token") String token,@PathVariable long gameId, @RequestBody Object json){
         LinkedHashMap jsonbody=(LinkedHashMap)json;
         String userIdstring=jsonbody.get("userId").toString();
         String cardIdstring=jsonbody.get("cardId").toString();
-        long userId=convert_to_long(userIdstring);
-        int cardId=convert_to_int(cardIdstring);
+        long userId=convertToLong(userIdstring);
+        int cardId=convertToInt(cardIdstring);
         this.service.updateGodCard(gameId,userId,cardId);
      }
 
     @PostMapping("/movement/{gameId}")
-    public Game moveWorker(@PathVariable long gameId, @RequestBody Object json){
+    public Game moveWorker(@RequestHeader(value = "token") String token,@PathVariable long gameId, @RequestBody Object json){
         LinkedHashMap jsonbody=(LinkedHashMap)json;
         String userIdstring=jsonbody.get("userId").toString();
         String workerIdstring=jsonbody.get("workerId").toString();
         String posXstring=jsonbody.get("posX").toString();
         String posYstring=jsonbody.get("posY").toString();
-        long userId=convert_to_long(userIdstring);
-        int workerId=convert_to_int(workerIdstring);
-        int posX=convert_to_int(posXstring);
-        int posY=convert_to_int(posYstring);
+        long userId=convertToLong(userIdstring);
+        int workerId=convertToInt(workerIdstring);
+        int posX=convertToInt(posXstring);
+        int posY=convertToInt(posYstring);
         return(this.gameservice.move(userId,gameId,workerId,posX,posY));
     }
 
     @PostMapping("/building/{gameId}")
-    public Game build(@PathVariable long gameId, @RequestBody Object json){
+    public Game build(@RequestHeader(value = "token") String token,@PathVariable long gameId, @RequestBody Object json){
         LinkedHashMap jsonbody=(LinkedHashMap)json;
         String userIdstring=jsonbody.get("userId").toString();
         String workerIdstring=jsonbody.get("workerId").toString();
         String posXstring=jsonbody.get("posX").toString();
         String posYstring=jsonbody.get("posY").toString();
-        long userId=convert_to_long(userIdstring);
-        int workerId=convert_to_int(workerIdstring);
-        int posX=convert_to_int(posXstring);
-        int posY=convert_to_int(posYstring);
+        long userId=convertToLong(userIdstring);
+        int workerId=convertToInt(workerIdstring);
+        int posX=convertToInt(posXstring);
+        int posY=convertToInt(posYstring);
         return(this.gameservice.build(gameId,userId,workerId,posX,posY));
     }
 
     @PostMapping("/waive/{gameId")
-    public void cancelGodPower(@PathVariable long gameId, @RequestBody Object json){
+    public void cancelGodPower(@RequestHeader(value = "token") String token,@PathVariable long gameId, @RequestBody Object json){
         LinkedHashMap jsonbody=(LinkedHashMap)json;
         String userIdstring=jsonbody.get("userId").toString();
-        long userId=convert_to_long(userIdstring);
+        long userId=convertToLong(userIdstring);
         this.gameservice.waiveGodCard(gameId,userId);
     }
 
 
     @GetMapping("/turn/{gameId}")
-    public Game turn(@PathVariable long gameId){
-        return(this.gameservice.changeturn(gameId));
+    public Game turn(@RequestHeader(value = "token") String token,@PathVariable long gameId){
+        return(this.gameservice.changeTurn(gameId));
     }
 
 

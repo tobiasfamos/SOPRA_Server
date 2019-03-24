@@ -294,6 +294,7 @@ public class SantoriniControllerTest {
         this.mockMvc.perform(post("/invitation")
                 .content(jsonfile)
                 .contentType(APPLICATION_JSON_UTF8)
+                .header("token",newUser3.getToken())
                 .header("sending an invitation","invitation ID's"))
                 .andExpect(status().isOk());
     }
@@ -313,6 +314,7 @@ public class SantoriniControllerTest {
         long id=newUser4.getId();
 
         this.mockMvc.perform(get("/invitation/"+id)
+                .header("token",newUser4.getToken())
                 .header("test getting all invitations","invitations"))
                 .andExpect(status().isOk());
     }
@@ -322,9 +324,18 @@ public class SantoriniControllerTest {
         //write the jsonfile
         String jsonfile = "{\"inviterId\" : \"5\", \"inviteeId\" : \"7\", \"answer\" : \"true\"}";
 
+        //create a new User
+        User testUser7 = new User();
+        testUser7.setName("testName");
+        testUser7.setUsername("testUsername7");
+        testUser7.setBirthday(LocalDate.ofYearDay(1111,11));
+        testUser7.setPassword("testPassword");
+        User newUser7 = userService.createUser(testUser7);
+
         this.mockMvc.perform(put("/invitation")
                 .content(jsonfile)
                 .contentType(APPLICATION_JSON_UTF8)
+                .header("token",newUser7.getToken())
                 .header("writing an answer, update invitations","invitations ID and answer"))
                 .andExpect(status().isOk());
     }
@@ -364,12 +375,21 @@ public class SantoriniControllerTest {
         game.setGameId((long)1);
         gameRepository.save(game);
 
+        //create a new User
+        User testUser6 = new User();
+        testUser6.setName("testName");
+        testUser6.setUsername("testUsername6");
+        testUser6.setBirthday(LocalDate.ofYearDay(1111,11));
+        testUser6.setPassword("testPassword");
+        User newUser6 = userService.createUser(testUser6);
+
         //write the jsonfile
         String jsonfile = "{\"userId\" : \"5\", \"workerId\" : \"7\", \"posX\" : \"1\",\"posY\" : \"1\"}";
 
         this.mockMvc.perform(post("/movement/1")
                 .content(jsonfile)
                 .contentType(APPLICATION_JSON_UTF8)
+                .header("token",newUser6.getToken())
                 .header("movement","movement"))
                 .andExpect(status().isOk());
     }
@@ -381,12 +401,21 @@ public class SantoriniControllerTest {
         game.setGameId((long)1);
         gameRepository.save(game);
 
+        //create a new User
+        User testUser5 = new User();
+        testUser5.setName("testName");
+        testUser5.setUsername("testUsername5");
+        testUser5.setBirthday(LocalDate.ofYearDay(1111,11));
+        testUser5.setPassword("testPassword");
+        User newUser5 = userService.createUser(testUser5);
+
         //write the jsonfile
         String jsonfile = "{\"userId\" : \"5\", \"workerId\" : \"7\", \"posX\" : \"1\",\"posY\" : \"1\"}";
 
         this.mockMvc.perform(post("/building/1")
                 .content(jsonfile)
                 .contentType(APPLICATION_JSON_UTF8)
+                .header("token",newUser5.getToken())
                 .header("building","building"))
                 .andExpect(status().isOk());
     }

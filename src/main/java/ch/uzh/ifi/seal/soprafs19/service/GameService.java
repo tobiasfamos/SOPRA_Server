@@ -63,7 +63,7 @@ public class GameService {
         //waive God Cards
     }
 
-    public Game changeturn(long gameId){
+    public Game changeTurn(long gameId){
         Game oldstateGame=this.GameRepository.findById(gameId);
         //change the turn
         Game newstateGame=this.GameRepository.findById(gameId);

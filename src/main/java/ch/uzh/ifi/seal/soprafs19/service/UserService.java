@@ -89,7 +89,7 @@ public class UserService {
         //give the inviter the answer of the invitee
     }
 
-    public void add_invitation(long inviterId, long receiverId){
+    public void addInvitation(long inviterId, long receiverId){
         User receiverUser = this.userRepository.findById(receiverId);
         log.info("got the receiver User");
         //Long inviterIdfinal=(Long)inviterId;
@@ -101,7 +101,7 @@ public class UserService {
         return(currentUser.getAllInvitations());
     }
 
-    public void startmatchmaking(long userId){
+    public void startMatchmaking(long userId){
         //start looking for other players
     }
 
